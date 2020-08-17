@@ -1,0 +1,7 @@
+<?jelly escape-by-default='true'?>
+<div>
+    <p>
+        If you need splitting your version using <b>Add Job Filter -> Filtered by version (build name). </b>
+        And you are expecting only relevant build ( if you need 3.4 version, you are looking for last 3.4 build as well).
+    </p>
+</div>
