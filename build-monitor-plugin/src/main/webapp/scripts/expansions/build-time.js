@@ -18,7 +18,7 @@ directive('buildTime', [function () {
                     ' | ',
                     '<span class="estimated" title="Typical build time">{{project.estimatedDuration}}</span>',
                 '</div>',
-
+// внизу то что мне нужно
                 '<div data-ng-show="!!project.lastCompletedBuild.timeElapsedSince && project.progress == 0" class="build-time">',
                     '<span class="estimated" title="Last execution">{{project.lastCompletedBuild.timeElapsedSince | estimatedTimeElapsedSince}}</span>',
                 '</div>',

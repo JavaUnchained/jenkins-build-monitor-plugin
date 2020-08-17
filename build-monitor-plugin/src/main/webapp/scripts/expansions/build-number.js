@@ -30,6 +30,7 @@ directive('buildNumber', [function () {
                     '</span>',
                 '</div>',
                 '<div data-ng-show="!!project.lastCompletedBuild.timeElapsedSince && project.progress == 0">',
+            //нииже то что нужно href и span
                     '<a',
                         'data-ng-show="!!project.lastCompletedBuild.name"',
                         'class="build-name"',

@@ -7,6 +7,8 @@ import net.sf.json.JSONObject;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
+import javax.servlet.ServletException;
+import java.io.IOException;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -20,6 +22,18 @@ public final class BuildMonitorDescriptor extends ViewDescriptor {
     @Override
     public String getDisplayName() {
         return "Build Monitor View";
+    }
+
+    public FormValidation doCheckRegex(@QueryParameter String value ) throws IOException, ServletException, InterruptedException  {
+        String v = Util.fixEmpty(value);
+        if (v != null) {
+            try {
+                Pattern.compile(v);
+            } catch (PatternSyntaxException pse) {
+                return FormValidation.error(pse.getMessage());
+            }
+        }
+        return FormValidation.ok();
     }
 
     // Copy-n-paste from ListView$Descriptor as sadly we cannot inherit from that class

@@ -2,10 +2,12 @@ package com.smartcodeltd.jenkinsci.plugins.buildmonitor.viewmodel;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
+import com.smartcodeltd.jenkinsci.plugins.buildmonitor.BuildMonitorView;
 import com.smartcodeltd.jenkinsci.plugins.buildmonitor.facade.RelativeLocation;
 import com.smartcodeltd.jenkinsci.plugins.buildmonitor.viewmodel.duration.Duration;
 import com.smartcodeltd.jenkinsci.plugins.buildmonitor.viewmodel.features.Feature;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.model.Result;
 import hudson.model.Run;
@@ -16,6 +18,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.regex.Pattern;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
@@ -29,19 +33,21 @@ public class JobView {
     private final Job<?, ?> job;
     private final boolean isPipelineJob;
     private final RelativeLocation relative;
+    private final String regex;
 
     private final List<Feature> features = newArrayList();
 
-    public static JobView of(Job<?, ?> job, List<Feature> features, boolean isPipelineJob) {
-        return new JobView(job, features, isPipelineJob, RelativeLocation.of(job), new Date());
+    public static JobView of(Job<?, ?> job, List<Feature> features, boolean isPipelineJob, String regex) {
+        return new JobView(job, features, isPipelineJob, RelativeLocation.of(job), new Date(), regex);
     }
 
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "systemTime is non-critical and no security should be compromised by mutating")
-    public JobView(Job<?, ?> job, List<Feature> features, boolean isPipelineJob, RelativeLocation relative, Date systemTime) {
+    public JobView(Job<?, ?> job, List<Feature> features, boolean isPipelineJob, RelativeLocation relative, Date systemTime, String regex) {
         this.job           = job;
         this.isPipelineJob = isPipelineJob;
         this.relative      = relative;
         this.systemTime    = systemTime;
+        this.regex         = regex;
 
         for (Feature feature : features) {
             this.features.add(feature.of(this));
@@ -132,22 +138,32 @@ public class JobView {
     @SuppressWarnings("unchecked")
 	public List<BuildViewModel> currentBuilds() {
     	List<BuildViewModel> currentBuilds = newArrayList();
-    	
     	RunList<Run<?, ?>> runList = ((RunList<Run<?, ?>>)job.getNewBuilds()).filter(BuildingPredicate.INSTANCE);
-
     	for (Iterator<Run<?, ?>> i = runList.iterator(); i.hasNext(); ) {
-    		currentBuilds.add(buildViewOf(i.next()));
+//            if(i.next().getDisplayName().contains("3.9")) {
+                currentBuilds.add(buildViewOf(i.next()));
+//            }
     	}
-    	
         return currentBuilds;
     }
 
     public BuildViewModel lastBuild() {
+        Run run;
+        if (regex != null && !regex.equals("")) {
+            Pattern pattern = Pattern.compile(regex);
+            for (ListIterator i = job.getBuilds().listIterator(); i.hasNext(); ) {
+                run = (Run) i.next();
+                if(pattern.matcher(run.getDisplayName()).matches()){
+                    return buildViewOf(run);
+                }
+            }
+        }
         return buildViewOf(job.getLastBuild());
     }
 
     public BuildViewModel lastCompletedBuild() {
         BuildViewModel previousBuild = lastBuild();
+
         while (previousBuild.isRunning() && previousBuild.hasPreviousBuild()) {
             previousBuild = previousBuild.previousBuild();
         }

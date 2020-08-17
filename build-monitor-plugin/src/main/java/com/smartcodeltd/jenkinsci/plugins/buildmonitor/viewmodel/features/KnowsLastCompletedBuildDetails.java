@@ -1,9 +1,12 @@
 package com.smartcodeltd.jenkinsci.plugins.buildmonitor.viewmodel.features;
 
+import com.smartcodeltd.jenkinsci.plugins.buildmonitor.BuildMonitorView;
 import com.smartcodeltd.jenkinsci.plugins.buildmonitor.viewmodel.BuildViewModel;
 import com.smartcodeltd.jenkinsci.plugins.buildmonitor.viewmodel.JobView;
 import com.smartcodeltd.jenkinsci.plugins.buildmonitor.viewmodel.duration.Duration;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.json.JSONObject;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author Jan Molak

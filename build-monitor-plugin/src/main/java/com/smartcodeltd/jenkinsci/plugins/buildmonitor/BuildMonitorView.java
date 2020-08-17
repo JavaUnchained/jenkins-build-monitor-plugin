@@ -39,10 +39,7 @@ import org.kohsuke.stapler.bind.JavaScriptMethod;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import static hudson.Util.filter;
 
@@ -54,17 +51,19 @@ public class BuildMonitorView extends ListView {
     public static final BuildMonitorDescriptor descriptor = new BuildMonitorDescriptor();
 
     private String title;
+    public String regex;
 
-    /**
-     * @param name  Name of the view to be displayed on the Views tab
-     * @param title Title to be displayed on the Build Monitor; defaults to 'name' if not set
-     */
     @DataBoundConstructor
-    public BuildMonitorView(String name, String title) {
+    public BuildMonitorView(String name, String title, String regex) {
         super(name);
-
         this.title = title;
+        this.regex = regex;
     }
+
+
+
+    @SuppressWarnings("unused") // used in .jelly
+    public String getRegex() { return regex;}
 
     @SuppressWarnings("unused") // used in .jelly
     public String getTitle() {
@@ -122,7 +121,7 @@ public class BuildMonitorView extends ListView {
 
             String requestedOrdering = req.getParameter("order");
             title                    = req.getParameter("title");
-
+            regex                    = req.getParameter("regex");
             currentConfig().setDisplayCommitters(json.optBoolean("displayCommitters", true));
             currentConfig().setBuildFailureAnalyzerDisplayedField(req.getParameter("buildFailureAnalyzerDisplayedField"));
             
@@ -152,7 +151,7 @@ public class BuildMonitorView extends ListView {
     }
 
     private List<JobView> jobViews() {
-        JobViews views = new JobViews(new StaticJenkinsAPIs(), currentConfig());
+        JobViews views = new JobViews(new StaticJenkinsAPIs(), currentConfig(), regex);
 
         //A little bit of evil to make the type system happy.
         @SuppressWarnings("unchecked")

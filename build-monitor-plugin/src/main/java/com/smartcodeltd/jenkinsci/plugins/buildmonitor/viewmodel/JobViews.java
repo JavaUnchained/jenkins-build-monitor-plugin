@@ -23,10 +23,12 @@ public class JobViews {
 
     private final StaticJenkinsAPIs jenkins;
     private final com.smartcodeltd.jenkinsci.plugins.buildmonitor.Config config;
+    private final String regex;
 
-    public JobViews(StaticJenkinsAPIs jenkins, com.smartcodeltd.jenkinsci.plugins.buildmonitor.Config config) {
+    public JobViews(StaticJenkinsAPIs jenkins, com.smartcodeltd.jenkinsci.plugins.buildmonitor.Config config, String regex) {
         this.jenkins = jenkins;
         this.config  = config;
+        this.regex   = regex;
     }
 
     public JobView viewOf(Job<?, ?> job) {
@@ -53,7 +55,7 @@ public class JobViews {
 
         boolean isPipelineJob = jenkins.hasPlugin(Pipeline) && job instanceof WorkflowJob;
 
-        return JobView.of(job, viewFeatures, isPipelineJob);
+        return JobView.of(job, viewFeatures, isPipelineJob,regex);
     }
 
     private boolean hasGroovyPostbuildActionClass() {

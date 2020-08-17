@@ -40,7 +40,9 @@
       <f:textbox name="includeRegex" field="includeRegex" />
     </f:entry>
   </f:optionalBlock>
-
+  <f:entry title="${%Include Regular Expression By Versioning For Widgets}:">
+      <f:textbox name="regex" field="regex"/>
+  </f:entry>
   <j:if test="${it.hasJobFilterExtensions()}">
     <f:block>
       <f:repeatableHeteroProperty field="jobFilters" hasHeader="true" addCaption="${%Add Job Filter}" />
@@ -82,8 +84,7 @@
 			<f:option value="Description" selected="${it.currentbuildFailureAnalyzerDisplayedField()=='Description'}">${%Description}</f:option>
 			<f:option value="None" selected="${it.currentbuildFailureAnalyzerDisplayedField()=='None'}">${%None}</f:option>
           </select>
-        </f:entry>
-
+    </f:entry>
   </f:section>
 
   <script>

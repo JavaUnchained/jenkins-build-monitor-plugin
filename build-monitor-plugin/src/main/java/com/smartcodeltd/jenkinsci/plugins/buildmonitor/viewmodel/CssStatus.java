@@ -22,7 +22,6 @@ public class CssStatus {
 
     public static String of(final JobView job) {
         String status = statusOf(job.lastResult());
-
         if (job.isDisabled()) {
             status += " disabled";
         }
