@@ -3,13 +3,18 @@
 Build Monitor Plugin provides a highly visible view of the status of selected Jenkins jobs.
 
 It easily accommodates different computer screen sizes and is ideal as an Extreme Feedback Device to be displayed on a screen on your office wall.
-(Inspired by the no longer maintained [RadiatorView](https://wiki.jenkins-ci.org/display/JENKINS/Radiator+View+Plugin) plugin).
-
-[![Build Status](https://travis-ci.org/jan-molak/jenkins-build-monitor-plugin.svg?branch=master)](https://travis-ci.org/jan-molak/jenkins-build-monitor-plugin)
-[![Join the chat at https://gitter.im/jenkins-build-monitor-plugin/Lobby](https://badges.gitter.im/jenkins-build-monitor-plugin/Lobby.svg)](https://gitter.im/jenkins-build-monitor-plugin/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Have a question? Perhaps it's already been answered - check the [FAQ](#faq) section below.
 
+## Main different between this fork and main repo
+
+This plugin allows you to filter jobs by build display name together with the job view filter [see my regex job filter](https://github.com/JavaUnchained/jenkins-view-regex-filter-plugin).
+
+The main different between an original plugin is additional features who allow you displayed last relevant job who you define in the regular expresion.
+
+For example, you need all tasks with version 4.0. you write the corresponding expression for filter and for the monitor. In this way, filter gives the monitor a set of tasks that have the specified version in any build. Then the monitor runs through these versions again and displays only builds with the specified version (status, time elapsed from the build, build name) on the monitor itself, and not the latest version as it usually does.
+
+Important note. This functionality does not conflict with the functionality of the main plugin. But to implement this feature, you will need another plugin described above, it is separated because its capabilities go beyond this plugin.
 ## Features
 
 I'd like to keep the plugin as simple as possible, yet useful and effective.
