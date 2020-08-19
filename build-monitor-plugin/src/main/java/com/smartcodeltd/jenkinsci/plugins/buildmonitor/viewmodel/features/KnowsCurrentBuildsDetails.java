@@ -53,9 +53,9 @@ public class KnowsCurrentBuildsDetails implements Feature<KnowsCurrentBuildsDeta
 
         public CurrentBuilds(List<BuildViewModel> currentBuilds) {
         	for (Iterator<BuildViewModel> i = currentBuilds.iterator(); i.hasNext(); ) {
-        	    if (i.next().name().contains("3.9")){
+//        	    if (i.next().name().contains("3.9")){
                     builds.add(new CurrentBuild(i.next()));
-                }
+//                }
         	}
         }
 
