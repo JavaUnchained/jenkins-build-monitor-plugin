@@ -26,6 +26,9 @@ package com.smartcodeltd.jenkinsci.plugins.buildmonitor;
 import com.smartcodeltd.jenkinsci.plugins.buildmonitor.api.Respond;
 import com.smartcodeltd.jenkinsci.plugins.buildmonitor.facade.StaticJenkinsAPIs;
 import com.smartcodeltd.jenkinsci.plugins.buildmonitor.installation.BuildMonitorInstallation;
+import com.smartcodeltd.jenkinsci.plugins.buildmonitor.order.ByStatus;
+import com.smartcodeltd.jenkinsci.plugins.buildmonitor.order.ByStatusWithRegex;
+import com.smartcodeltd.jenkinsci.plugins.buildmonitor.order.JobByRegexForStatusTemplate;
 import com.smartcodeltd.jenkinsci.plugins.buildmonitor.viewmodel.JobView;
 import com.smartcodeltd.jenkinsci.plugins.buildmonitor.viewmodel.JobViews;
 import hudson.Extension;
@@ -158,7 +161,13 @@ public class BuildMonitorView extends ListView {
         List<Job<?, ?>> projects = new ArrayList(filter(super.getItems(), Job.class));
         List<JobView> jobs = new ArrayList<JobView>();
 
-        Collections.sort(projects, currentConfig().getOrder());
+        if(currentConfig().getOrder() instanceof ByStatus && !regex.equals("") && regex != null){
+            List<JobByRegexForStatusTemplate> jobByRegexForStatusTemplateList = getJobsWithRegexArray(projects);
+            Collections.sort(jobByRegexForStatusTemplateList, new ByStatusWithRegex());
+            projects = extractJobFromJobRegexArray(jobByRegexForStatusTemplateList);
+        }else{
+            Collections.sort(projects, currentConfig().getOrder());
+        }
 
         for (Job project : projects) {
             jobs.add(views.viewOf(project));
@@ -167,26 +176,22 @@ public class BuildMonitorView extends ListView {
         return jobs;
     }
 
-    /**
-     * @Sample for my work
-     *
-     */
-    private List<JobView> jobViewsAndCompareByStatusWithRegex() {
-        JobViews views = new JobViews(new StaticJenkinsAPIs(), currentConfig(), regex);
-
-        //A little bit of evil to make the type system happy.
-        @SuppressWarnings("unchecked")
-        List<Job<?, ?>> projects = new ArrayList(filter(super.getItems(), Job.class));
-        List<JobView> jobs = new ArrayList<JobView>();
-
-        Collections.sort(projects, currentConfig().getOrder());
-
-        for (Job project : projects) {
-            jobs.add(views.viewOf(project));
+    private List<JobByRegexForStatusTemplate> getJobsWithRegexArray(List<Job<?, ?>> jobs) {
+        List<JobByRegexForStatusTemplate> jobByRegexForStatusTemplateList =  new ArrayList<>();
+        for (Job<?, ?> job : jobs) {
+            jobByRegexForStatusTemplateList.add(new JobByRegexForStatusTemplate(job, regex));
         }
+        return jobByRegexForStatusTemplateList;
+    }
 
+    private List<Job<?, ?>> extractJobFromJobRegexArray(List<JobByRegexForStatusTemplate> jobByRegexForStatusTemplates){
+        List<Job<?,?>> jobs = new ArrayList<>();
+        for (JobByRegexForStatusTemplate j : jobByRegexForStatusTemplates) {
+            jobs.add(j.getProjects());
+        }
         return jobs;
     }
+
     /**
      * When Jenkins is started up, Jenkins::loadTasks is called.
      * At that point config.xml file is unmarshaled into a Jenkins object containing a list of Views, including BuildMonitorView objects.
