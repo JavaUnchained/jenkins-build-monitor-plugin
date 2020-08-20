@@ -1,11 +1,12 @@
 package com.smartcodeltd.jenkinsci.plugins.buildmonitor.order;
 
-import hudson.model.Job;
 import hudson.model.Result;
 import hudson.model.Run;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.ListIterator;
+import java.util.regex.Pattern;
 
 public class ByStatusWithRegex implements Comparator<JobByRegexForStatusTemplate>, Serializable {
 
@@ -16,15 +17,13 @@ public class ByStatusWithRegex implements Comparator<JobByRegexForStatusTemplate
                 : compareProjects(a, b);
     }
 
-    // --
-
     private boolean bothProjectsHaveBuildHistory(JobByRegexForStatusTemplate a, JobByRegexForStatusTemplate b) {
-        return a.getLastCompletedBuild() != null && b.getLastCompletedBuild() != null;
+        return a.getProjects().getLastCompletedBuild() != null && b.getProjects().getLastCompletedBuild() != null;
     }
 
-    private int compareProjects(Job<?, ?> a, Job<?, ?> b) {
-        Run<?, ?> recentBuildOfA = a.getLastCompletedBuild();
-        Run<?, ?> recentBuildOfB = b.getLastCompletedBuild();
+    private int compareProjects(JobByRegexForStatusTemplate a, JobByRegexForStatusTemplate b) {
+        Run<?, ?> recentBuildOfA = a.getProjects().getLastCompletedBuild();
+        Run<?, ?> recentBuildOfB = b.getProjects().getLastCompletedBuild();
 
         if (recentBuildOfA == null && recentBuildOfB != null) {
             return -1;
@@ -35,9 +34,9 @@ public class ByStatusWithRegex implements Comparator<JobByRegexForStatusTemplate
         }
     }
 
-    private int compareRecentlyCompletedBuilds(Job<?, ?> a, Job<?, ?> b) {
-        Result lastResultOfA = a.getLastCompletedBuild().getResult();
-        Result lastResultOfB = b.getLastCompletedBuild().getResult();
+    private int compareRecentlyCompletedBuilds(JobByRegexForStatusTemplate a, JobByRegexForStatusTemplate b) {
+        Result lastResultOfA = iterateByJobs(a);
+        Result lastResultOfB = iterateByJobs(b);
 
         if (lastResultOfA == null && lastResultOfB == null) {
             return 0;
@@ -52,5 +51,20 @@ public class ByStatusWithRegex implements Comparator<JobByRegexForStatusTemplate
         } else {
             return 0;
         }
+    }
+
+    private Result iterateByJobs(JobByRegexForStatusTemplate job){
+        final String regex = job.regex;
+        if (regex != null && !regex.equals("")) {
+            Pattern pattern = Pattern.compile(regex);
+            Run run;
+            for(ListIterator i = job.getProjects().getBuilds().listIterator(); i.hasNext();){
+                run = (Run) i.next();
+                if (pattern.matcher(run.getDisplayName()).matches()) {
+                    return run.getResult();
+                }
+            }
+        }
+        return job.getProjects().getLastCompletedBuild().getResult();
     }
 }

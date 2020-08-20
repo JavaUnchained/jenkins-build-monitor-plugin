@@ -161,7 +161,7 @@ public class BuildMonitorView extends ListView {
         List<Job<?, ?>> projects = new ArrayList(filter(super.getItems(), Job.class));
         List<JobView> jobs = new ArrayList<JobView>();
 
-        if(currentConfig().getOrder() instanceof ByStatus && !regex.equals("") && regex != null){
+        if(regex != null && !regex.isEmpty() && currentConfig().getOrder() instanceof ByStatus){
             List<JobByRegexForStatusTemplate> jobByRegexForStatusTemplateList = getJobsWithRegexArray(projects);
             Collections.sort(jobByRegexForStatusTemplateList, new ByStatusWithRegex());
             projects = extractJobFromJobRegexArray(jobByRegexForStatusTemplateList);
