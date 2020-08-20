@@ -51,7 +51,7 @@ public class BuildMonitorView extends ListView {
     public static final BuildMonitorDescriptor descriptor = new BuildMonitorDescriptor();
 
     private String title;
-    public String regex;
+    private String regex;
 
     @DataBoundConstructor
     public BuildMonitorView(String name, String title, String regex) {
@@ -167,6 +167,26 @@ public class BuildMonitorView extends ListView {
         return jobs;
     }
 
+    /**
+     * @Sample for my work
+     *
+     */
+    private List<JobView> jobViewsAndCompareByStatusWithRegex() {
+        JobViews views = new JobViews(new StaticJenkinsAPIs(), currentConfig(), regex);
+
+        //A little bit of evil to make the type system happy.
+        @SuppressWarnings("unchecked")
+        List<Job<?, ?>> projects = new ArrayList(filter(super.getItems(), Job.class));
+        List<JobView> jobs = new ArrayList<JobView>();
+
+        Collections.sort(projects, currentConfig().getOrder());
+
+        for (Job project : projects) {
+            jobs.add(views.viewOf(project));
+        }
+
+        return jobs;
+    }
     /**
      * When Jenkins is started up, Jenkins::loadTasks is called.
      * At that point config.xml file is unmarshaled into a Jenkins object containing a list of Views, including BuildMonitorView objects.
