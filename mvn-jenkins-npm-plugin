@@ -7,6 +7,8 @@ npm install
 
 cd ..
 
-mvn clean package
+chmod +x mvnw
+
+./mvnw clean package
 
 mv target/*.hpi "$*"
