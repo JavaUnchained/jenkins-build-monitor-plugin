@@ -11,4 +11,4 @@ chmod +x mvnw
 
 ./mvnw clean package
 
-mv target/*.hpi "$*"
+mv build-monitor-plugin/target/*.hpi "$*"
