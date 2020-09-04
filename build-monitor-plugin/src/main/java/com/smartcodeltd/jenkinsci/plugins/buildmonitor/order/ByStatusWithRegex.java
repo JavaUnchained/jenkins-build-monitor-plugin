@@ -1,5 +1,6 @@
 package com.smartcodeltd.jenkinsci.plugins.buildmonitor.order;
 
+import hudson.model.Job;
 import hudson.model.Result;
 import hudson.model.Run;
 
@@ -7,6 +8,8 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.ListIterator;
 import java.util.regex.Pattern;
+
+import static com.smartcodeltd.jenkinsci.plugins.buildmonitor.RegexMatcher.selectSpecificBuild;
 
 public class ByStatusWithRegex implements Comparator<JobByRegexForStatusTemplate>, Serializable {
 
@@ -54,17 +57,8 @@ public class ByStatusWithRegex implements Comparator<JobByRegexForStatusTemplate
     }
 
     private Result iterateByJobs(JobByRegexForStatusTemplate job){
-        final String regex = job.regex;
-        if (regex != null && !regex.equals("")) {
-            Pattern pattern = Pattern.compile(regex);
-            Run run;
-            for(ListIterator i = job.getProjects().getBuilds().listIterator(); i.hasNext();){
-                run = (Run) i.next();
-                if (pattern.matcher(run.getDisplayName()).matches()) {
-                    return run.getResult();
-                }
-            }
-        }
-        return job.getProjects().getLastCompletedBuild().getResult();
+        Job<?,?> j =  job.getProjects();
+        Run run = selectSpecificBuild(j, job.regex);
+        return run == null ? j.getLastCompletedBuild().getResult(): run.getResult();
     }
 }
