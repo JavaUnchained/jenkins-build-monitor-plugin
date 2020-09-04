@@ -141,9 +141,7 @@ public class JobView {
     	List<BuildViewModel> currentBuilds = newArrayList();
     	RunList<Run<?, ?>> runList = ((RunList<Run<?, ?>>)job.getNewBuilds()).filter(BuildingPredicate.INSTANCE);
     	for (Iterator<Run<?, ?>> i = runList.iterator(); i.hasNext(); ) {
-//            if(i.next().getDisplayName().contains("3.9")) {
                 currentBuilds.add(buildViewOf(i.next()));
-//            }
     	}
         return currentBuilds;
     }
