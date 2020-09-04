@@ -22,6 +22,7 @@ import java.util.ListIterator;
 import java.util.regex.Pattern;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.smartcodeltd.jenkinsci.plugins.buildmonitor.RegexMatcher.selectSpecificBuild;
 import static java.lang.String.format;
 
 /**
@@ -148,17 +149,8 @@ public class JobView {
     }
 
     public BuildViewModel lastBuild() {
-        Run run;
-        if (regex != null && !regex.equals("")) {
-            Pattern pattern = Pattern.compile(regex);
-            for (ListIterator i = job.getBuilds().listIterator(); i.hasNext(); ) {
-                run = (Run) i.next();
-                if(pattern.matcher(run.getDisplayName()).matches()){
-                    return buildViewOf(run);
-                }
-            }
-        }
-        return buildViewOf(job.getLastBuild());
+        Run run = selectSpecificBuild(job, regex);
+        return run == null ? buildViewOf(job.getLastBuild()) : buildViewOf(run);
     }
 
     public BuildViewModel lastCompletedBuild() {
